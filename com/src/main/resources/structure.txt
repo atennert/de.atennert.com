@@ -1,0 +1,133 @@
+@startuml
+
+interface IClientRegistration {
+    +formatRegistrationData(String name, Set<String> interpreters, Map<String, String> addressesProtocols) : Object
+    +formatUnregistrationData(String name) : Object
+    +getInterpreterID() : String
+}
+interface INodeRegistration {
+    +registerNode(String name)
+    +unregisterNode(String name)
+    +getNodeCount() : int
+    +getNodeNames() : Set<String>
+    +addNodeAddressProtocol(String node, String address, String protocol)
+    +getNodeAddresses(String node) : Set<String>
+    +getNodeName(String address) : String
+    +getNodeAddress(String node, String protocol) : String
+    +getNodeProtocols(String node) : Set<String>
+    +getNodeProtocol(String address) : String
+    +deleteNodeAddressProtocol(String address)
+    +deleteNodeAddressProtocol(String node, String protocol)
+    +addNodeInterpreter(String node, String interpreter)
+    +getNodeInterpreters(String node) : Set<String>
+    +getInterpreterNodes(String interpreter) : Set<String>
+    +deleteNodeInterpreter(String node, String interpreter)
+}
+interface IInterpreter {
+    +decode(String message) : Object
+    +encode (Object data) : String
+    +interpret (String message, String sender, Map<String, Object> oh, INodeRegistration nr) : String
+}
+class InterpreterManager {
+    -objectMap : Map<String, Object>
+    -nr : INodeRegistration
+    -interpreterPool : ExecutorService
+    -{static}threadCount int
+    +setInterpreter (Map<String, IInterpreter> cis)
+    +encode (Object data, String type) : Future<String>
+    +decode (String message, String type) : Future<Object>
+    +interpret (String message, String sender, String type) : Future<String>
+    +init ()
+    +dispose ()
+    +setObjectHandler (Map<String, Object> oh)
+    +setNodeRegistration (INodeRegistration nr)
+    +setCommunicator (Communicator com)
+}
+class Encoder
+class Decoder
+class Interpreter
+enum NodeKeys {
+    NODE_NAME
+    NODE_ADDRESS
+    SERVER_ADDRESS
+    PROTOCOL
+    INTERPRETER
+    +id : String
+    -NodeKeys(String id)
+}
+abstract class Receiver {
+    +init()
+    +dispose()
+    +{abstract}setAddress(String address)
+    +{abstract}getAddress() : String
+    +setInterpreterManager(InterpreterManager interpreter)
+}
+class ReceiverManager {
+    +init()
+    +dispose()
+    +setCommunicator(Communicator com)
+    +setInterpreterManager(InterpreterManager interpreter)
+    +setReceiver(Map<String,Receiver> cis)
+    +setNodeRegistration(INodeRegistration nr)
+}
+interface ISender {
+    +send(String address, String message) : String
+}
+class SenderManager {
+    -senderPool : ExecutorService
+    -{static}threadCount : int
+    +init()
+    +dispose()
+    +setSender(Map<String,ISender> sender)
+    +getSendProtocols() : Set<String>
+    #send(String address, String message, String protocol) : Future<String>
+}
+class Sender
+class Communicator << (S,#FF7700) Singleton >> {
+    -name : String
+    -isServer : boolean
+    -serverName : String
+    -serverAddresses : Map<String,String>
+    -serverInterpreter : List<String>
+    +{static}getInstance() : Communicator
+    +init()
+    +dispose()
+    +setName(String name)
+    +setSenderManager(SenderManager cm)
+    +setNodeRegistration(INodeRegistration nr)
+    +setInterpreterManager(InterpreterManager im)
+    +setIsServer(boolean isServer)
+    +setClientRegistration(IClientRegistration cr)
+    +setServerName(String serverName)
+    +setServerAddresses(Map<String, String> serverAddresses)
+    +setServerInterpreter(List<String> serverInterpreter)
+    +send(String hostname, Object data, String type) : Future<Object>
+    +forward(String hostname, String message, String type) : String
+    +getTargetAddress(String hostname) : String
+    +getIdent() : String
+    #setReceiverReady()
+}
+
+
+InterpreterManager ..> Encoder : use
+InterpreterManager ..> Decoder : use
+InterpreterManager ..> Interpreter : use
+InterpreterManager "im" -- "com" Communicator
+InterpreterManager --> "nr" INodeRegistration
+InterpreterManager *-- "0..*\ninterpreter" IInterpreter
+
+Receiver o-- "interpreter" InterpreterManager
+
+ReceiverManager o-- "interpreter" InterpreterManager
+ReceiverManager *-- "0..*\nreceiver" Receiver
+ReceiverManager --> "nr" INodeRegistration
+ReceiverManager --> "com" Communicator
+
+SenderManager ..> Sender
+SenderManager *-- "0..*\nsender" ISender
+
+Communicator *-- "sm" SenderManager
+Communicator --> "nr" INodeRegistration
+Communicator --> "cr" IClientRegistration
+
+@enduml
