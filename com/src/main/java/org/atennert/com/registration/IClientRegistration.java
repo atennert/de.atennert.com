@@ -23,7 +23,7 @@ import java.util.Set;
  * Interface for a class that creates a message for (un-)registering the client
  * at the server.
  */
-public interface IClientRegistration<T>
+public interface IClientRegistration
 {
 
     /**
@@ -36,7 +36,7 @@ public interface IClientRegistration<T>
      * @return The formated data for registering at the server via the
      *         interpreter named by the ID.
      */
-    public T formatRegistrationData (String name, Set<String> interpreters,
+    public Object formatRegistrationData(String name, Set<String> interpreters,
             Map<String, String> addressesProtocols);
 
     /**
@@ -45,10 +45,10 @@ public interface IClientRegistration<T>
      * @return The formated data for unregistering at the server via the
      *         interpreter named by the ID.
      */
-    public T formatUnregistrationData (String name);
+    public Object formatUnregistrationData(String name);
 
     /**
      * @return The ID of the interpreter to use for encoding the data.
      */
-    public String getInterpreterID ();
+    public String getInterpreterID();
 }
