@@ -36,7 +36,7 @@ public interface ICommunicatorAccess
      * @param type
      *            The interpreter type
      */
-    Future<Object> send(String hostname, Object data, String type);
+    Future<DataContainer> send(String hostname, DataContainer data, String type);
 
     /**
      * This method forwards a message of a specified interpreter type to another

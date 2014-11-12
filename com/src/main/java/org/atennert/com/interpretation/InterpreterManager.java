@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.atennert.com.communication.Communicator;
+import org.atennert.com.communication.DataContainer;
 import org.atennert.com.registration.INodeRegistration;
 
 /**
@@ -33,41 +34,40 @@ public class InterpreterManager
 
     private class Encoder implements Callable<String>
     {
-
-        private final Object data;
+        private final DataContainer data;
 
         private final IInterpreter iif;
 
-        public Encoder (Object data, IInterpreter iif)
+        public Encoder(DataContainer data, IInterpreter iif)
         {
             this.data = data;
             this.iif = iif;
         }
 
         @Override
-        public String call () throws Exception
+        public String call() throws Exception
         {
-            return iif.encode( data );
+            return iif.encode(data);
         }
     }
 
-    private class Decoder implements Callable<Object>
+    private class Decoder implements Callable<DataContainer>
     {
 
         private final String message;
 
         private final IInterpreter iif;
 
-        public Decoder (String message, IInterpreter iif)
+        public Decoder(String message, IInterpreter iif)
         {
             this.message = message;
             this.iif = iif;
         }
 
         @Override
-        public Object call () throws Exception
+        public DataContainer call() throws Exception
         {
-            return iif.decode( message );
+            return iif.decode(message);
         }
 
     }
@@ -79,7 +79,7 @@ public class InterpreterManager
 
         private final IInterpreter iif;
 
-        public Interpreter (String message, String sender, IInterpreter iif)
+        public Interpreter(String message, String sender, IInterpreter iif)
         {
             this.message = message;
             this.sender = sender;
@@ -87,9 +87,9 @@ public class InterpreterManager
         }
 
         @Override
-        public String call () throws Exception
+        public String call() throws Exception
         {
-            return iif.interpret( message, sender, objectMap, nr );
+            return iif.interpret(message, sender, objectMap, nr);
         }
 
     }
@@ -103,7 +103,7 @@ public class InterpreterManager
     private Communicator com;
     private static final int threadCount = 5;
 
-    public void setInterpreter (Map<String, IInterpreter> cis)
+    public void setInterpreter(Map<String, IInterpreter> cis)
     {
         this.interpreter = cis;
     }
@@ -117,31 +117,31 @@ public class InterpreterManager
      *            type of the data
      * @return
      */
-    public Future<String> encode (Object data, String type)
+    public Future<String> encode(DataContainer data, String type)
     {
-        final IInterpreter targetInterpreter = interpreter.get( type );
+        final IInterpreter targetInterpreter = interpreter.get(type);
         IInterpreter ic = null;
         try
         {
             ic = targetInterpreter.getClass().newInstance();
         }
-        catch (final InstantiationException e)
+        catch ( final InstantiationException e )
         {
             // TODO Autoated catch block
             e.printStackTrace();
         }
-        catch (final IllegalAccessException e)
+        catch ( final IllegalAccessException e )
         {
             // TODO Auto-generatch block
             e.printStackTrace();
         }
 
-        if (ic == null)
+        if ( ic == null )
         {
             return null;
         }
 
-        return interpreterPool.submit( new Encoder( data, ic ) );
+        return interpreterPool.submit(new Encoder(data, ic));
     }
 
     /**
@@ -152,31 +152,31 @@ public class InterpreterManager
      *            the type of data
      * @return
      */
-    public Future<Object> decode (String message, String type)
+    public Future<DataContainer> decode(String message, String type)
     {
-        final IInterpreter targetInterpreter = interpreter.get( type );
+        final IInterpreter targetInterpreter = interpreter.get(type);
         IInterpreter ic = null;
         try
         {
             ic = targetInterpreter.getClass().newInstance();
         }
-        catch (final InstantiationException e)
+        catch ( final InstantiationException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (final IllegalAccessException e)
+        catch ( final IllegalAccessException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        if (ic == null)
+        if ( ic == null )
         {
             return null;
         }
 
-        return interpreterPool.submit( new Decoder( message, ic ) );
+        return interpreterPool.submit(new Decoder(message, ic));
     }
 
     /**
@@ -187,34 +187,34 @@ public class InterpreterManager
      *            The type of the message.
      * @return
      */
-    public Future<String> interpret (String message, String sender, String type)
+    public Future<String> interpret(String message, String sender, String type)
     {
-        final IInterpreter targetInterpreter = interpreter.get( type );
+        final IInterpreter targetInterpreter = interpreter.get(type);
         IInterpreter ic = null;
         try
         {
             ic = targetInterpreter.getClass().newInstance();
         }
-        catch (final InstantiationException e)
+        catch ( final InstantiationException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (final IllegalAccessException e)
+        catch ( final IllegalAccessException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        if (ic == null)
+        if ( ic == null )
         {
             return null;
         }
 
-        return interpreterPool.submit( new Interpreter( message, sender, ic ) );
+        return interpreterPool.submit(new Interpreter(message, sender, ic));
     }
 
-    public void dispose ()
+    public void dispose()
     {
         interpreterPool.shutdown();
         this.interpreter = null;
@@ -222,27 +222,27 @@ public class InterpreterManager
         this.nr = null;
     }
 
-    public void setObjectHandler (Map<String, Object> oh)
+    public void setObjectHandler(Map<String, Object> oh)
     {
         this.objectMap = oh;
     }
 
-    public void setNodeRegistration (INodeRegistration nr)
+    public void setNodeRegistration(INodeRegistration nr)
     {
         this.nr = nr;
     }
 
-    public void setCommunicator (Communicator com)
+    public void setCommunicator(Communicator com)
     {
         this.com = com;
     }
 
-    public void init ()
+    public void init()
     {
-        interpreterPool = Executors.newFixedThreadPool( threadCount );
-        for (final String interpreterName : interpreter.keySet())
+        interpreterPool = Executors.newFixedThreadPool(threadCount);
+        for ( final String interpreterName : interpreter.keySet() )
         {
-            nr.addNodeInterpreter( com.getIdent(), interpreterName );
+            nr.addNodeInterpreter(com.getIdent(), interpreterName);
         }
     }
 }

@@ -18,6 +18,7 @@ package org.atennert.com.interpretation;
 
 import java.util.Map;
 
+import org.atennert.com.communication.DataContainer;
 import org.atennert.com.registration.INodeRegistration;
 
 /**
@@ -33,7 +34,7 @@ public interface IInterpreter
      * @param message
      * @return
      */
-    public Object decode (String message);
+    public DataContainer decode(String message);
 
     /**
      * Encode data to a message that is to be send.
@@ -41,7 +42,7 @@ public interface IInterpreter
      * @param data
      * @return
      */
-    public String encode (Object data);
+    public String encode(DataContainer data);
 
     /**
      * Interpret a received request from another node.
@@ -53,6 +54,6 @@ public interface IInterpreter
      * @param nr
      * @return
      */
-    public String interpret (String message, String sender, Map<String, Object> oh,
+    public String interpret(String message, String sender, Map<String, Object> oh,
             INodeRegistration nr);
 }

@@ -19,6 +19,8 @@ package org.atennert.com.registration;
 import java.util.Map;
 import java.util.Set;
 
+import org.atennert.com.communication.DataContainer;
+
 /**
  * Interface for a class that creates a message for (un-)registering the client
  * at the server.
@@ -36,7 +38,7 @@ public interface IClientRegistration
      * @return The formated data for registering at the server via the
      *         interpreter named by the ID.
      */
-    public Object formatRegistrationData(String name, Set<String> interpreters,
+    public DataContainer formatRegistrationData(String name, Set<String> interpreters,
             Map<String, String> addressesProtocols);
 
     /**
@@ -45,7 +47,7 @@ public interface IClientRegistration
      * @return The formated data for unregistering at the server via the
      *         interpreter named by the ID.
      */
-    public Object formatUnregistrationData(String name);
+    public DataContainer formatUnregistrationData(String name);
 
     /**
      * @return The ID of the interpreter to use for encoding the data.
