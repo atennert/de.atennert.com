@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import org.atennert.com.communication.Communicator;
 import org.atennert.com.communication.DataContainer;
+import org.atennert.com.communication.MessageContainer;
 import org.atennert.com.registration.INodeRegistration;
 
 /**
@@ -187,9 +188,9 @@ public class InterpreterManager
      *            The type of the message.
      * @return
      */
-    public Future<String> interpret(String message, String sender, String type)
+    public Future<String> interpret(MessageContainer msgContainer, String sender)
     {
-        final IInterpreter targetInterpreter = interpreter.get(type);
+        final IInterpreter targetInterpreter = interpreter.get(msgContainer.interpreter);
         IInterpreter ic = null;
         try
         {
@@ -211,7 +212,7 @@ public class InterpreterManager
             return null;
         }
 
-        return interpreterPool.submit(new Interpreter(message, sender, ic));
+        return interpreterPool.submit(new Interpreter(msgContainer.message, sender, ic));
     }
 
     public void dispose()

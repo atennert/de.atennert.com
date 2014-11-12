@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright 2012 Andreas Tennert
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,16 +20,16 @@ package org.atennert.com.communication;
  * This is the interface for all implemented senders. A sender
  * is supposed to send a message to a given address.
  */
-public interface ISender {
+public interface ISender
+{
 
-	/**
-	 * Sends a message to a certain address. Returns
-	 * the response if there is one, null otherwise.
-	 * 
-	 * @param address Device address
-	 * @param message The message
-	 * @param params The parameters
-	 * @return The response if there is one, null otherwise.
-	 */
-	public String send(String address, String message);
+    /**
+     * Sends a message to a certain address. Returns
+     * the response if there is one, null otherwise.
+     *
+     * @param address Device address
+     * @param message The message
+     * @return The response if there is one, null otherwise.
+     */
+    public MessageContainer send(String address, MessageContainer message);
 }
