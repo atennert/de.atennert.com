@@ -5,5 +5,5 @@ import java.util.concurrent.Future;
 
 public interface IDataAcceptance
 {
-    Future<DataContainer> evaluateData(String sender, DataContainer data);
+    Future<DataContainer> evaluateData(String hostAddress, DataContainer data);
 }

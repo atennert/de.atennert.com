@@ -17,12 +17,12 @@
 package org.atennert.com.interpretation;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.atennert.com.communication.Communicator;
 import org.atennert.com.communication.DataContainer;
 import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.communication.MessageContainer;
@@ -102,7 +102,6 @@ public class InterpreterManager
     private IDataAcceptance acceptance;
     private INodeRegistration nr;
     private ExecutorService interpreterPool;
-    private Communicator com;
     private static final int threadCount = 5;
 
     public void setInterpreter(Map<String, IInterpreter> cis)
@@ -118,32 +117,14 @@ public class InterpreterManager
      * @param type
      *            type of the data
      * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public Future<String> encode(DataContainer data, String type)
+    public Future<String> encode(DataContainer data, String type) throws InstantiationException, IllegalAccessException
     {
-        final IInterpreter targetInterpreter = interpreter.get(type);
-        IInterpreter ic = null;
-        try
-        {
-            ic = targetInterpreter.getClass().newInstance();
-        }
-        catch ( final InstantiationException e )
-        {
-            // TODO Autoated catch block
-            e.printStackTrace();
-        }
-        catch ( final IllegalAccessException e )
-        {
-            // TODO Auto-generatch block
-            e.printStackTrace();
-        }
+        IInterpreter ic = interpreter.get(type).getClass().newInstance();
 
-        if ( ic == null )
-        {
-            return null;
-        }
-
-        return interpreterPool.submit(new Encoder(data, ic));
+        return ic == null ? null : interpreterPool.submit(new Encoder(data, ic));
     }
 
     /**
@@ -153,32 +134,14 @@ public class InterpreterManager
      * @param type
      *            the type of data
      * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public Future<DataContainer> decode(String message, String type)
+    public Future<DataContainer> decode(String message, String type) throws InstantiationException, IllegalAccessException
     {
-        final IInterpreter targetInterpreter = interpreter.get(type);
-        IInterpreter ic = null;
-        try
-        {
-            ic = targetInterpreter.getClass().newInstance();
-        }
-        catch ( final InstantiationException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( final IllegalAccessException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        IInterpreter ic = interpreter.get(type).getClass().newInstance();
 
-        if ( ic == null )
-        {
-            return null;
-        }
-
-        return interpreterPool.submit(new Decoder(message, ic));
+        return ic == null ? null : interpreterPool.submit(new Decoder(message, ic));
     }
 
     /**
@@ -188,32 +151,14 @@ public class InterpreterManager
      * @param type
      *            The type of the message.
      * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public Future<String> interpret(MessageContainer msgContainer, String sender)
+    public Future<String> interpret(MessageContainer msgContainer, String sender) throws InstantiationException, IllegalAccessException
     {
-        final IInterpreter targetInterpreter = interpreter.get(msgContainer.interpreter);
-        IInterpreter ic = null;
-        try
-        {
-            ic = targetInterpreter.getClass().newInstance();
-        }
-        catch ( final InstantiationException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( final IllegalAccessException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        IInterpreter ic = interpreter.get(msgContainer.interpreter).getClass().newInstance();
 
-        if ( ic == null )
-        {
-            return null;
-        }
-
-        return interpreterPool.submit(new Interpreter(msgContainer.message, sender, ic));
+        return ic == null ? null : interpreterPool.submit(new Interpreter(msgContainer.message, sender, ic));
     }
 
     public void dispose()
@@ -234,17 +179,13 @@ public class InterpreterManager
         this.nr = nr;
     }
 
-    public void setCommunicator(Communicator com)
-    {
-        this.com = com;
-    }
-
     public void init()
     {
         interpreterPool = Executors.newFixedThreadPool(threadCount);
-        for ( final String interpreterName : interpreter.keySet() )
-        {
-            nr.addNodeInterpreter(com.getIdent(), interpreterName);
-        }
+    }
+
+    public Set<String> getInterpreterIds()
+    {
+        return interpreter.keySet();
     }
 }

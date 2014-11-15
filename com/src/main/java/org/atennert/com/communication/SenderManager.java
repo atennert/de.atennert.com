@@ -17,7 +17,6 @@
 package org.atennert.com.communication;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,35 +61,19 @@ public class SenderManager
         this.sender = sender;
     }
 
-    public Set<String> getSendProtocols()
-    {
-        // TODO (questionable since protocols can be fetched from registration)
-        return null;
-    }
-
     public void init()
     {
         senderPool = Executors.newFixedThreadPool(threadCount);
     }
 
-    protected Future<MessageContainer> send(String address, MessageContainer message, String protocol)
+    protected Future<MessageContainer> send(String address, MessageContainer message, String protocol) throws InstantiationException, IllegalAccessException
     {
+        // TODO check for unknown protocol and throw exception
+
         ISender targetSender = sender.get(protocol);
         ISender sndr = null;
-        try
-        {
-            sndr = targetSender.getClass().newInstance();
-        }
-        catch ( InstantiationException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch ( IllegalAccessException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        sndr = targetSender.getClass().newInstance();
 
         if ( sndr == null )
         {
