@@ -16,9 +16,8 @@
 
 package org.atennert.com.interpretation;
 
-import java.util.Map;
-
 import org.atennert.com.communication.DataContainer;
+import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.registration.INodeRegistration;
 
 /**
@@ -49,11 +48,10 @@ public interface IInterpreter
      *
      * @param message
      * @param sender
-     * @param oh
-     * @param com
+     * @param acceptance
      * @param nr
      * @return
      */
-    public String interpret(String message, String sender, Map<String, Object> oh,
+    public String interpret(String message, String sender, IDataAcceptance acceptance,
             INodeRegistration nr);
 }

@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import org.atennert.com.communication.Communicator;
 import org.atennert.com.communication.DataContainer;
+import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.communication.MessageContainer;
 import org.atennert.com.registration.INodeRegistration;
 
@@ -90,7 +91,7 @@ public class InterpreterManager
         @Override
         public String call() throws Exception
         {
-            return iif.interpret(message, sender, objectMap, nr);
+            return iif.interpret(message, sender, acceptance, nr);
         }
 
     }
@@ -98,7 +99,7 @@ public class InterpreterManager
     private Map<String, IInterpreter> interpreter;
 
     /** Objects accessible for interpretation process */
-    private Map<String, Object> objectMap;
+    private IDataAcceptance acceptance;
     private INodeRegistration nr;
     private ExecutorService interpreterPool;
     private Communicator com;
@@ -219,13 +220,13 @@ public class InterpreterManager
     {
         interpreterPool.shutdown();
         this.interpreter = null;
-        this.objectMap = null;
+        this.acceptance = null;
         this.nr = null;
     }
 
-    public void setObjectHandler(Map<String, Object> oh)
+    public void setAcceptance(IDataAcceptance acceptance)
     {
-        this.objectMap = oh;
+        this.acceptance = acceptance;
     }
 
     public void setNodeRegistration(INodeRegistration nr)
