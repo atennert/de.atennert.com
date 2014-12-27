@@ -9,4 +9,10 @@ public class MapDataContainer extends DataContainer
     {
         super(null, data);
     }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getData()
+    {
+        return (Map<String, Object>)data;
+    }
 }

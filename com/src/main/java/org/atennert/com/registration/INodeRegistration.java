@@ -67,13 +67,6 @@ public interface INodeRegistration
     public void deleteNodeAddressProtocol(String address);
 
     /**
-     * Deletes an entry identified by a node protocol combination.
-     * @param node
-     * @param protocol
-     */
-    public void deleteNodeAddressProtocol(String node, String protocol);
-
-    /**
      * Adds a node interpreter combination.
      * @param node
      * @param interpreter

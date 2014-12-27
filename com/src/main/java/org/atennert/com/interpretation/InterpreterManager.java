@@ -169,7 +169,7 @@ public class InterpreterManager
         this.nr = null;
     }
 
-    public void setAcceptance(IDataAcceptance acceptance)
+    public void setDataAcceptance(IDataAcceptance acceptance)
     {
         this.acceptance = acceptance;
     }
