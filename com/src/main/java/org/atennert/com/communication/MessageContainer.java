@@ -12,4 +12,10 @@ public class MessageContainer
         this.interpreter = interpreter;
         this.message = message;
     }
+
+    @Override
+    public String toString()
+    {
+        return "MessageContainer: " + interpreter + " :: " + message;
+    }
 }
