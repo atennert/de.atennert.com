@@ -14,24 +14,23 @@
  * the License.
  *******************************************************************************/
 
-package org.atennert.com.communication;
-
-import org.atennert.com.util.MessageContainer;
+package org.atennert.com.util;
 
 /**
- * This is the interface for all implemented senders. A sender
- * is supposed to send a message to a given address.
+ * Container class for exchanging data between the com framework
+ * and the application.
  */
-public interface ISender
+public class DataContainer
 {
+    /** Data identifier (key or name) */
+    public final String dataId;
 
-    /**
-     * Sends a message to a certain address. Returns
-     * the response if there is one, null otherwise.
-     *
-     * @param address Device address
-     * @param message The message
-     * @return The response if there is one, null otherwise.
-     */
-    public MessageContainer send(String address, MessageContainer message);
+    /** The data */
+    public final Object data;
+
+    public DataContainer(String dataId, Object data)
+    {
+        this.dataId = dataId;
+        this.data = data;
+    }
 }

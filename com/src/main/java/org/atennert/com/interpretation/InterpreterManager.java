@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2012 Andreas Tennert
+ * Copyright 2015 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -23,10 +23,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.atennert.com.communication.DataContainer;
 import org.atennert.com.communication.IDataAcceptance;
-import org.atennert.com.communication.MessageContainer;
 import org.atennert.com.registration.INodeRegistration;
+import org.atennert.com.util.DataContainer;
+import org.atennert.com.util.MessageContainer;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This is the controller for all implemented interpreters.
@@ -102,12 +103,39 @@ public class InterpreterManager
     private IDataAcceptance acceptance;
     private INodeRegistration nr;
     private ExecutorService interpreterPool;
-    private static final int threadCount = 5;
+    private static final int THREAD_COUNT = 3;
 
+    @Required
     public void setInterpreter(Map<String, IInterpreter> cis)
     {
         this.interpreter = cis;
     }
+
+    @Required
+    public void setDataAcceptance(IDataAcceptance acceptance)
+    {
+        this.acceptance = acceptance;
+    }
+
+    @Required
+    public void setNodeRegistration(INodeRegistration nr)
+    {
+        this.nr = nr;
+    }
+
+    public void init()
+    {
+        interpreterPool = Executors.newFixedThreadPool(THREAD_COUNT);
+    }
+
+    public void dispose()
+    {
+        interpreterPool.shutdown();
+        this.interpreter = null;
+        this.acceptance = null;
+        this.nr = null;
+    }
+
 
     /**
      * Decodes a specific data type to a String for transmission purposes. Used
@@ -161,28 +189,6 @@ public class InterpreterManager
         return ic == null ? null : interpreterPool.submit(new Interpreter(msgContainer.message, sender, ic));
     }
 
-    public void dispose()
-    {
-        interpreterPool.shutdown();
-        this.interpreter = null;
-        this.acceptance = null;
-        this.nr = null;
-    }
-
-    public void setDataAcceptance(IDataAcceptance acceptance)
-    {
-        this.acceptance = acceptance;
-    }
-
-    public void setNodeRegistration(INodeRegistration nr)
-    {
-        this.nr = nr;
-    }
-
-    public void init()
-    {
-        interpreterPool = Executors.newFixedThreadPool(threadCount);
-    }
 
     public Set<String> getInterpreterIds()
     {

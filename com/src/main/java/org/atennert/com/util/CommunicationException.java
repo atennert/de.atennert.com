@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2012 Andreas Tennert
+ * Copyright 2015 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,23 +14,19 @@
  * the License.
  *******************************************************************************/
 
-package org.atennert.com;
+package org.atennert.com.util;
 
-/**
- * Keys for all available properties.
- */
-public enum NodeKeys
+public class CommunicationException extends RuntimeException
 {
-    NODE_NAME ("node_name"),
-    NODE_ADDRESS ("node_address"),
-    SERVER_ADDRESS ("server_address"),
-    PROTOCOL ("protocol"),
-    INTERPRETER ("interpreter");
+    private static final long serialVersionUID = -898415758047014162L;
 
-    public final String id;
-
-    private NodeKeys (String id)
+    public CommunicationException(Throwable cause)
     {
-        this.id = id;
+        super(cause);
+    }
+
+    public CommunicationException(String message)
+    {
+        super(message);
     }
 }

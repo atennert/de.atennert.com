@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2012 Andreas Tennert
+ * Copyright 2015 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,9 +16,9 @@
 
 package org.atennert.com.interpretation;
 
-import org.atennert.com.communication.DataContainer;
 import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.registration.INodeRegistration;
+import org.atennert.com.util.DataContainer;
 
 /**
  * This class serves as Interface for all implemented Interpreters. The type
@@ -52,6 +52,5 @@ public interface IInterpreter
      * @param nr
      * @return
      */
-    public String interpret(String message, String sender, IDataAcceptance acceptance,
-            INodeRegistration nr);
+    public String interpret(String message, String sender, IDataAcceptance acceptance, INodeRegistration nr);
 }

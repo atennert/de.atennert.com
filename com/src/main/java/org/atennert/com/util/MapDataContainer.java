@@ -14,24 +14,25 @@
  * the License.
  *******************************************************************************/
 
-package org.atennert.com.communication;
+package org.atennert.com.util;
 
-import org.atennert.com.util.MessageContainer;
+import java.util.Map;
 
 /**
- * This is the interface for all implemented senders. A sender
- * is supposed to send a message to a given address.
+ * Extension of the DataContainer whose data is a Map. Instead of just one
+ * key value pair it can contain multiple key value pairs. The dataId field
+ * of this classes instances is always <code>null</code>.
  */
-public interface ISender
+public class MapDataContainer extends DataContainer
 {
+    public MapDataContainer(Map<String, Object> data)
+    {
+        super(null, data);
+    }
 
-    /**
-     * Sends a message to a certain address. Returns
-     * the response if there is one, null otherwise.
-     *
-     * @param address Device address
-     * @param message The message
-     * @return The response if there is one, null otherwise.
-     */
-    public MessageContainer send(String address, MessageContainer message);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getData()
+    {
+        return (Map<String, Object>)data;
+    }
 }

@@ -14,24 +14,23 @@
  * the License.
  *******************************************************************************/
 
-package org.atennert.com.communication;
+package org.atennert.com.util;
 
-import org.atennert.com.util.MessageContainer;
-
-/**
- * This is the interface for all implemented senders. A sender
- * is supposed to send a message to a given address.
- */
-public interface ISender
+public class MessageContainer
 {
+    public final String interpreter;
 
-    /**
-     * Sends a message to a certain address. Returns
-     * the response if there is one, null otherwise.
-     *
-     * @param address Device address
-     * @param message The message
-     * @return The response if there is one, null otherwise.
-     */
-    public MessageContainer send(String address, MessageContainer message);
+    public final String message;
+
+    public MessageContainer(String interpreter, String message)
+    {
+        this.interpreter = interpreter;
+        this.message = message;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "MessageContainer: " + interpreter + " :: " + message;
+    }
 }

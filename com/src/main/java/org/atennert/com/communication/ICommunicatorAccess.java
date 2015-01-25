@@ -18,6 +18,8 @@ package org.atennert.com.communication;
 
 import java.util.concurrent.Future;
 
+import org.atennert.com.util.DataContainer;
+
 /**
  * Interface for accessing communicator functionality.
  *

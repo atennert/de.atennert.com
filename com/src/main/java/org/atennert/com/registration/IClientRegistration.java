@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2012 Andreas Tennert
+ * Copyright 2015 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,7 +19,7 @@ package org.atennert.com.registration;
 import java.util.Map;
 import java.util.Set;
 
-import org.atennert.com.communication.DataContainer;
+import org.atennert.com.util.DataContainer;
 
 /**
  * Interface for a class that creates a message for (un-)registering the client
@@ -38,8 +38,7 @@ public interface IClientRegistration
      * @return The formated data for registering at the server via the
      *         interpreter named by the ID.
      */
-    public DataContainer formatRegistrationData(String name, Set<String> interpreters,
-            Map<String, String> addressesProtocols);
+    public DataContainer formatRegistrationData(String name, Set<String> interpreters, Map<String, String> addressesProtocols);
 
     /**
      * @param name
