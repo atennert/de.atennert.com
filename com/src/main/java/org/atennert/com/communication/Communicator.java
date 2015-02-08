@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2012 Andreas Tennert
+ * Copyright 2014 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,192 +18,221 @@ package org.atennert.com.communication;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.atennert.com.interpretation.InterpreterManager;
 import org.atennert.com.registration.IClientRegistration;
 import org.atennert.com.registration.INodeRegistration;
+import org.atennert.com.util.CommunicationException;
+import org.atennert.com.util.DataContainer;
+import org.atennert.com.util.MessageContainer;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.util.Assert;
 
 /**
  * Adapter to access package functions from program.
  */
-public class Communicator
+public class Communicator implements ICommunicatorAccess
 {
-
-    private static Communicator INSTANCE = null;
-
-    public static Communicator getInstance()
-    {
-        if( INSTANCE == null )
-        {
-            INSTANCE = new Communicator();
-        }
-        return INSTANCE;
-    }
-
     private SenderManager sm;
-    private String name;
+    private String myHostName;
     private INodeRegistration nr;
-    private IClientRegistration cr;
+    private IClientRegistration cr = null;
+
+    private Map<String, AbstractReceiver> receiver;
 
     private InterpreterManager im;
-    private boolean isServer;
+    private boolean isServer = true;
 
-    private String serverName;
-    private Map<String, String> serverAddresses;
-    private List<String> serverInterpreter;
+    private String serverName = null;
 
-    public void setName( String name )
+
+
+    @Required
+    public void setHostName(String hostName)
     {
-        this.name = name;
+        this.myHostName = hostName;
     }
 
-    public void setSenderManager( SenderManager cm )
+    @Required
+    public void setSenderManager(SenderManager sm)
     {
-        this.sm = cm;
+        this.sm = sm;
     }
 
-    public void setNodeRegistration( INodeRegistration nr )
+    @Required
+    public void setNodeRegistration(INodeRegistration nr)
     {
         this.nr = nr;
     }
 
-    public void setInterpreterManager( InterpreterManager im )
+    @Required
+    public void setReceiver(Map<String, AbstractReceiver> cis)
+    {
+        this.receiver = cis;
+    }
+
+    @Required
+    public void setInterpreterManager(InterpreterManager im)
     {
         this.im = im;
     }
 
-    public void setIsServer( boolean isServer )
+    public void setIsServer(boolean isServer)
     {
         this.isServer = isServer;
     }
 
-    public void setClientRegistration( IClientRegistration cr )
+    public void setClientRegistration(IClientRegistration cr)
     {
         this.cr = cr;
     }
 
-    public void setServerName( String serverName )
+    public void setServerName(String serverName)
     {
         this.serverName = serverName;
     }
 
-    public void setServerAddresses( Map<String, String> serverAddresses )
-    {
-        this.serverAddresses = serverAddresses;
-    }
 
-    public void setServerInterpreter( List<String> serverInterpreter )
-    {
-        this.serverInterpreter = serverInterpreter;
-    }
 
     /**
      * Initializes the communicator. (Spring function)
      */
     public void init()
     {
-        if( isServer )
-        {
+        nr.registerNode(myHostName);
 
-        }
-        else
+        registerInterpreters();
+
+        initializeReceivers();
+
+        if ( !isServer )
         {
-            // register server connections
-            nr.registerNode( serverName );
-            for( final String iptr : serverInterpreter )
-            {
-                nr.addNodeInterpreter( serverName, iptr );
-            }
-            for( final String key : serverAddresses.keySet() )
-            {
-                nr.addNodeAddressProtocol( serverName, serverAddresses.get( key ), key );
-            }
+            Assert.notNull(cr);
+            Assert.notNull(serverName);
+
+            registerAsClient();
         }
-        nr.registerNode( name );
     }
 
     /**
-     * Sends a message to a target host and, if provided, returns the raw
-     * content of the answer.
-     *
-     * @param hostname
-     *            Target, the data has to be send to
+     * Stop the Communicator. (Spring function)
+     */
+    public synchronized void dispose()
+    {
+        if ( !isServer )
+        {
+            // unregister at server
+            final DataContainer data = cr.formatUnregistrationData(myHostName);
+            send(serverName, data, cr.getInterpreterID());
+        }
+        sm = null;
+        im = null;
+        nr = null;
+        receiver = null;
+    }
+
+    /**
+     * Used for server communication (registration and deregistration)
+     * @param hostName
      * @param data
-     *            The data to send
-     * @param type
-     *            The interpreter type
+     * @param interpreter
      */
-    public Future<Object> send( String hostname, Object data, String type )
+    private void send(String hostName, DataContainer data, String interpreter)
     {
-        final String address = getTargetAddress( hostname );
-        final String protocol = nr.getNodeProtocol( address );
-        String response = null;
-        // FIXME let threads wait for response
+        String hostAddress = null;
+        String protocol = null;
+        for ( String address : nr.getNodeSendAddresses(hostName) )
+        {
+            protocol = nr.getNodeSendProtocol(address);
+            Set<String> interpreters = nr.getInterpretersForProtocol(protocol);
+            if ( interpreters.contains(interpreter) )
+            {
+                hostAddress = address;
+                break;
+            }
+        }
+
+        if ( hostAddress == null )
+        {
+            throw new CommunicationException("[Communicator.send] unable to find address for " + hostName);
+        }
+
         try
         {
-            response = sm.send( address, type + "@@" + im.encode( data, type ).get(), protocol )
-                    .get();
+            sm.send(hostAddress, new MessageContainer(interpreter, im.encode(data, interpreter).get()), protocol);
         }
-        catch( final InterruptedException e )
+        catch ( final Exception e )
         {
-            e.printStackTrace();
+            throw new CommunicationException(e);
         }
-        catch( final ExecutionException e )
-        {
-            e.printStackTrace();
-        }
-        if( response == null || !response.contains( "@@" ) )
-        {
-            return null;
-        }
-        final String rspParts[] = response.split( "@@", 2 );
-        return im.decode( rspParts[1], rspParts[0] );
     }
 
-    /**
-     * This method forwards a message of a specified interpreter type to another
-     * node. <br>
-     * <br>
-     * <i>Only Interpreters should use this method.</i>
-     *
-     * @param hostname
-     * @param message
-     * @param type
-     * @return
-     */
-    public String forward( String hostname, String message, String type )
+    private void initializeReceivers()
     {
-        // TODO no return value
-        final String address = getTargetAddress( hostname );
-        final String protocol = nr.getNodeProtocol( address );
-        String response = null;
+        AbstractReceiver rif;
+        for ( String key : receiver.keySet() )
+        {
+            rif = receiver.get(key);
+            rif.start();
+            nr.addNodeSendAddressProtocol(myHostName, rif.getAddress(), key);
+        }
+    }
+
+    private void registerInterpreters()
+    {
+        for ( final String interpreterName : im.getInterpreterIds() )
+        {
+            nr.addNodeInterpreter(myHostName, interpreterName);
+        }
+    }
+
+
+
+    @Override
+    public Future<DataContainer> send(String hostName, DataContainer data) throws CommunicationException
+    {
+        final String address = getHostAddress(hostName);
+        final String protocol = nr.getNodeSendProtocol(address);
+        final String interpreter = getInterpreterForProtocol(hostName, protocol);
+        MessageContainer response = null;
+
         // FIXME let threads wait for response
         try
         {
-            response = sm.send( address, type + "@@" + message, protocol ).get();
+            response = sm.send(address, new MessageContainer(interpreter, im.encode(data, interpreter).get()), protocol).get();
+
+            return response == null ? null : im.decode(response.message, response.interpreter);
         }
-        catch( final InterruptedException e )
+        catch ( final Exception e )
         {
-            e.printStackTrace();
+            throw new CommunicationException(e);
         }
-        catch( final ExecutionException e )
+    }
+
+    @Override
+    public String forward(String hostName, String message) throws CommunicationException
+    {
+        final String address = getHostAddress(hostName);
+        final String protocol = nr.getNodeSendProtocol(address);
+        final String interpreter = getInterpreterForProtocol(hostName, protocol);
+        MessageContainer response = null;
+
+        // FIXME let threads wait for response
+        try
         {
-            e.printStackTrace();
+            response = sm.send(address, new MessageContainer(interpreter, message), protocol).get();
         }
-        if( response == null || !response.contains( "@@" ) )
+        catch ( final Exception e )
         {
-            return null;
+            throw new CommunicationException(e);
         }
 
-        final String rspParts[] = response.split( "@@", 2 );
-        if( rspParts[0].equals( type ) )
+        if ( response != null && response.interpreter.equals(interpreter) )
         {
-            return rspParts[1];
+            return response.message;
         }
 
         return null;
@@ -216,62 +245,52 @@ public class Communicator
      *            Node name
      * @return Node address
      */
-    public String getTargetAddress( String hostname )
+    private String getHostAddress(String hostname)
     {
-        final Set<String> addresses = nr.getNodeAddresses( hostname );
-        String address = null;
-        final Iterator<String> iter = addresses.iterator();
-        if( iter.hasNext() )
+        final Iterator<String> iter = nr.getNodeSendAddresses(hostname).iterator();
+        if ( iter.hasNext() )
         {
-            address = iter.next();
+            return iter.next();
         }
-        return address;
+        return null;
     }
 
     /**
-     * Stop the Communicator. (Spring function)
+     * Returns an interpreter that can be used with the given protocol.
+     *
+     * @param protocol communication protocol
+     * @return interpreter ID
      */
-    public synchronized void dispose()
+    private String getInterpreterForProtocol(String hostName, String protocol)
     {
-        if( !isServer )
+        Set<String> nodeInterpreters = nr.getNodeInterpreters(hostName);
+        final Iterator<String> iter = nr.getInterpretersForProtocol(protocol).iterator();
+        while ( iter.hasNext() )
         {
-            // unregister at server
-            final Object data = cr.formatUnregistrationData( name );
-            send( serverName, data, cr.getInterpreterID() );
+            String interpreter = iter.next();
+            if ( nodeInterpreters.contains(interpreter) )
+            {
+                return interpreter;
+            }
         }
-        sm = null;
-        im = null;
-        nr = null;
-        INSTANCE = null;
-    }
-
-    /**
-     * @return The nodes name
-     */
-    public String getIdent()
-    {
-        return name;
+        return null;
     }
 
     /**
      * Should only be used by ReceiverManager.
      */
-    protected synchronized void setReceiverReady()
+    private synchronized void registerAsClient()
     {
-        // register at server
-        if( !isServer )
+        final Set<String> addresses = nr.getNodeSendAddresses(myHostName);
+        final Map<String, String> addressesProtocols = new HashMap<String, String>();
+        for ( final String address : addresses )
         {
-            final Set<String> addresses = nr.getNodeAddresses( name );
-            final Map<String, String> addressesProtocols = new HashMap<String, String>();
-            for( final String address : addresses )
-            {
-                addressesProtocols.put( address, nr.getNodeProtocol( address ) );
-            }
-
-            final Set<String> interpreters = nr.getNodeInterpreters( name );
-
-            final Object data = cr.formatRegistrationData( name, interpreters, addressesProtocols );
-            send( serverName, data, cr.getInterpreterID() );
+            addressesProtocols.put(address, nr.getNodeSendProtocol(address));
         }
+
+        final Set<String> interpreters = nr.getNodeInterpreters(myHostName);
+
+        final DataContainer data = cr.formatRegistrationData(myHostName, interpreters, addressesProtocols);
+        send(serverName, data, cr.getInterpreterID());
     }
 }
