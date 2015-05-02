@@ -276,9 +276,6 @@ public class Communicator implements ICommunicatorAccess
         return null;
     }
 
-    /**
-     * Should only be used by ReceiverManager.
-     */
     private synchronized void registerAsClient()
     {
         final Set<String> addresses = nr.getNodeSendAddresses(myHostName);

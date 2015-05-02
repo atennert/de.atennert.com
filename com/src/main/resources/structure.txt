@@ -2,7 +2,30 @@
 
 class CommunicationException
 
-class Communicator
+class Communicator {
+  -myHostName : String
+  -receiver : Map<String, AbstractReceiver>
+  -isServer : boolean
+  -serverName : String
+  +setHostName(String hostName)
+  +setSenderManager(SenderManager sm)
+  +setNodeRegistration(INodeRegistration nr)
+  +setReceiver(Map<String, AbstractReceiver> cis)
+  +setInterpreterManager(InterpreterManager im)
+  +setIsServer(boolean isServer)
+  +setClientRegistration(IClientRegistration cr)
+  +setServerName(String serverName)
+  +init()
+  +dispose()
+  -send(String hostName, DataContainer data, String interpreter)
+  -initializeReceivers()
+  -registerInterpreters()
+  +send(String hostName, DataContainer data) : Future<DataContainer>
+  +forward(String hostName, String message) : String
+  -getHostAddress(String hostname)
+  -getInterpreterForProtocol(String hostName, String protocol) : String
+  -registerAsClient()  
+}
 
 class DataContainer {
   +dataId : String
@@ -81,9 +104,24 @@ class Sender {
   +call() : MessageContainer
 }
 
-interface IClientRegistration
+interface IClientRegistration {
+  +formatRegistrationData(String name, Set<String> interpreters, Map<String, String> addressesProtocols) : DataContainer
+  +formatUnregistrationData(String name) : DataContainer
+  +getInterpreterID() : String
+}
 
-interface INodeRegistration
+interface INodeRegistration {
+  +registerNode(String name)
+  +unregisterNode(String name)
+  +addNodeSendAddressProtocol(String node, String address, String protocol)
+  +getNodeSendAddresses(String node) : Set<String>
+  +getNodeSendProtocol(String address) : String
+  +deleteNodeSendAddressProtocol(String address)
+  +addNodeInterpreter(String node, String interpreter)
+  +getNodeInterpreters(String node) : Set<String>
+  +getInterpretersForProtocol(String protocol) : Set<String>
+  +deleteNodeInterpreter(String node, String interpreter)
+}
 
 
 DataContainer <|.. MapDataContainer
@@ -93,6 +131,9 @@ ICommunicatorAccess <|.. Communicator
 AbstractReceiver o-- "interpreter" InterpreterManager
 
 Communicator o-- "im" InterpreterManager
+Communicator o-- "cr" IClientRegistration
+Communicator o-- "nr" INodeRegistration
+Communicator *-- "sm" SenderManager
 
 InterpreterManager ..> Encoder : <<use>>
 InterpreterManager ..> Decoder : <<use>>
