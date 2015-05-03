@@ -144,9 +144,9 @@ public class Communicator implements ICommunicatorAccess
     {
         String hostAddress = null;
         String protocol = null;
-        for ( String address : nr.getNodeSendAddresses(hostName) )
+        for ( String address : nr.getNodeReceiveAddresses(hostName) )
         {
-            protocol = nr.getNodeSendProtocol(address);
+            protocol = nr.getNodeReceiveProtocol(address);
             Set<String> interpreters = nr.getInterpretersForProtocol(protocol);
             if ( interpreters.contains(interpreter) )
             {
@@ -177,7 +177,7 @@ public class Communicator implements ICommunicatorAccess
         {
             rif = receiver.get(key);
             rif.start();
-            nr.addNodeSendAddressProtocol(myHostName, rif.getAddress(), key);
+            nr.addNodeReceiveAddressProtocol(myHostName, rif.getAddress(), key);
         }
     }
 
@@ -195,7 +195,7 @@ public class Communicator implements ICommunicatorAccess
     public Future<DataContainer> send(String hostName, DataContainer data) throws CommunicationException
     {
         final String address = getHostAddress(hostName);
-        final String protocol = nr.getNodeSendProtocol(address);
+        final String protocol = nr.getNodeReceiveProtocol(address);
         final String interpreter = getInterpreterForProtocol(hostName, protocol);
         MessageContainer response = null;
 
@@ -216,7 +216,7 @@ public class Communicator implements ICommunicatorAccess
     public String forward(String hostName, String message) throws CommunicationException
     {
         final String address = getHostAddress(hostName);
-        final String protocol = nr.getNodeSendProtocol(address);
+        final String protocol = nr.getNodeReceiveProtocol(address);
         final String interpreter = getInterpreterForProtocol(hostName, protocol);
         MessageContainer response = null;
 
@@ -247,7 +247,7 @@ public class Communicator implements ICommunicatorAccess
      */
     private String getHostAddress(String hostname)
     {
-        final Iterator<String> iter = nr.getNodeSendAddresses(hostname).iterator();
+        final Iterator<String> iter = nr.getNodeReceiveAddresses(hostname).iterator();
         if ( iter.hasNext() )
         {
             return iter.next();
@@ -278,11 +278,11 @@ public class Communicator implements ICommunicatorAccess
 
     private synchronized void registerAsClient()
     {
-        final Set<String> addresses = nr.getNodeSendAddresses(myHostName);
+        final Set<String> addresses = nr.getNodeReceiveAddresses(myHostName);
         final Map<String, String> addressesProtocols = new HashMap<String, String>();
         for ( final String address : addresses )
         {
-            addressesProtocols.put(address, nr.getNodeSendProtocol(address));
+            addressesProtocols.put(address, nr.getNodeReceiveProtocol(address));
         }
 
         final Set<String> interpreters = nr.getNodeInterpreters(myHostName);

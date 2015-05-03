@@ -44,27 +44,27 @@ public interface INodeRegistration
      * @param address
      * @param protocol
      */
-    public void addNodeSendAddressProtocol(String node, String address, String protocol);
+    public void addNodeReceiveAddressProtocol(String node, String address, String protocol);
 
     /**
      * Returns a nodes addresses.
      * @param node
      * @return
      */
-    public Set<String> getNodeSendAddresses(String node);
+    public Set<String> getNodeReceiveAddresses(String node);
 
     /**
      * Returns the protocol associated with an address.
      * @param address
      * @return
      */
-    public String getNodeSendProtocol(String address);
+    public String getNodeReceiveProtocol(String address);
 
     /**
      * Deletes an entry identified by the address.
      * @param address
      */
-    public void deleteNodeSendAddressProtocol(String address);
+    public void deleteNodeReceiveAddressProtocol(String address);
 
     /**
      * Adds a node interpreter combination.

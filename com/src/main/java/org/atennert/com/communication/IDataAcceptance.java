@@ -43,9 +43,9 @@ public interface IDataAcceptance
      * Evaluate received data as part of the interpretation process from
      * the COM framework.
      *
-     * @param hostAddress address from the host, that has sent the data
+     * @param senderAddress address from the host, that has sent the data
      * @param data the received data
      * @return response data for the remote host, can be <code>null</code>
      */
-    Future<DataContainer> evaluateData(String hostAddress, DataContainer data);
+    Future<DataContainer> evaluateData(String senderAddress, DataContainer data);
 }
