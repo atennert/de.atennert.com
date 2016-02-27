@@ -7,21 +7,24 @@ public class MessageContainerTest
 {
     @Test
     public void testErrorContainer(){
-        MessageContainer mc = new MessageContainer(MessageContainer.Error.UNKOWN_HOST);
-        Assert.assertTrue(mc.hasError());
+        MessageContainer mc = new MessageContainer(MessageContainer.Exception.UNKOWN_HOST);
+        Assert.assertTrue(mc.hasException());
 
-        mc = new MessageContainer(MessageContainer.Error.IO);
-        Assert.assertTrue(mc.hasError());
+        mc = new MessageContainer(MessageContainer.Exception.IO);
+        Assert.assertTrue(mc.hasException());
+
+        mc = new MessageContainer(MessageContainer.Exception.EMPTY);
+        Assert.assertTrue(mc.hasException());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testContainerException(){
-        new MessageContainer(MessageContainer.Error.NONE);
+        new MessageContainer(MessageContainer.Exception.NONE);
     }
 
     @Test
     public void checkSimpleCorrectCase(){
         MessageContainer mc = new MessageContainer("Interpreter", "message");
-        Assert.assertFalse(mc.hasError());
+        Assert.assertFalse(mc.hasException());
     }
 }

@@ -197,14 +197,13 @@ public class Communicator implements ICommunicatorAccess
         final String address = getHostAddress(hostName);
         final String protocol = nr.getNodeReceiveProtocol(address);
         final String interpreter = getInterpreterForProtocol(hostName, protocol);
-        MessageContainer response = null;
 
         // FIXME let threads wait for response
         try
         {
-            response = sm.send(address, new MessageContainer(interpreter, im.encode(data, interpreter).get()), protocol).get();
+            MessageContainer response= sm.send(address, new MessageContainer(interpreter, im.encode(data, interpreter).get()), protocol).get();
 
-            return response == null ? null : im.decode(response.message, response.interpreter);
+            return im.decode(response, response.interpreter);
         }
         catch ( final Exception e )
         {

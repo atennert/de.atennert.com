@@ -57,11 +57,11 @@ public class InterpreterManager
     private class Decoder implements Callable<DataContainer>
     {
 
-        private final String message;
+        private final MessageContainer message;
 
         private final IInterpreter iif;
 
-        public Decoder(String message, IInterpreter iif)
+        public Decoder(MessageContainer message, IInterpreter iif)
         {
             this.message = message;
             this.iif = iif;
@@ -77,12 +77,12 @@ public class InterpreterManager
 
     private class Interpreter implements Callable<String>
     {
-        private final String message;
+        private final MessageContainer message;
         private final String sender;
 
         private final IInterpreter iif;
 
-        public Interpreter(String message, String sender, IInterpreter iif)
+        public Interpreter(MessageContainer message, String sender, IInterpreter iif)
         {
             this.message = message;
             this.sender = sender;
@@ -165,7 +165,7 @@ public class InterpreterManager
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public Future<DataContainer> decode(String message, String type) throws InstantiationException, IllegalAccessException
+    public Future<DataContainer> decode(MessageContainer message, String type) throws InstantiationException, IllegalAccessException
     {
         IInterpreter ic = interpreter.get(type).getClass().newInstance();
 
@@ -186,7 +186,7 @@ public class InterpreterManager
     {
         IInterpreter ic = interpreter.get(msgContainer.interpreter).getClass().newInstance();
 
-        return ic == null ? null : interpreterPool.submit(new Interpreter(msgContainer.message, sender, ic));
+        return ic == null ? null : interpreterPool.submit(new Interpreter(msgContainer, sender, ic));
     }
 
 

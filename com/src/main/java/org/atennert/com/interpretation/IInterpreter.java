@@ -19,6 +19,7 @@ package org.atennert.com.interpretation;
 import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
+import org.atennert.com.util.MessageContainer;
 
 /**
  * This class serves as Interface for all implemented Interpreters. The type
@@ -33,7 +34,7 @@ public interface IInterpreter
      * @param message
      * @return
      */
-    public DataContainer decode(String message);
+    public DataContainer decode(MessageContainer message);
 
     /**
      * Encode data to a message that is to be send.
@@ -52,5 +53,5 @@ public interface IInterpreter
      * @param nr
      * @return
      */
-    public String interpret(String message, String sender, IDataAcceptance acceptance, INodeRegistration nr);
+    public String interpret(MessageContainer message, String sender, IDataAcceptance acceptance, INodeRegistration nr);
 }

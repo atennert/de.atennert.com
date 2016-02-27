@@ -18,21 +18,22 @@ package org.atennert.com.util;
 
 public class MessageContainer
 {
-    public enum Error {
+    public enum Exception {
         NONE,
         UNKOWN_HOST,
-        IO;
+        IO,
+        EMPTY;
     }
 
     public final String interpreter;
 
     public final String message;
 
-    public final Error error;
+    public final Exception error;
 
-    public MessageContainer(String interpreter, String message, Error error)
+    public MessageContainer(String interpreter, String message, Exception error)
     {
-        if (Error.NONE.equals(error) && (interpreter == null || message == null)){
+        if (Exception.NONE.equals(error) && (interpreter == null || message == null)){
             throw new IllegalArgumentException("Expected an error other then N or useful data!");
         }
         this.interpreter = interpreter;
@@ -42,16 +43,16 @@ public class MessageContainer
 
     public MessageContainer(String interpreter, String message)
     {
-        this(interpreter, message, Error.NONE);
+        this(interpreter, message, Exception.NONE);
     }
 
-    public MessageContainer(Error error)
+    public MessageContainer(Exception error)
     {
         this(null, null, error);
     }
 
-    public boolean hasError(){
-        return error != Error.NONE;
+    public boolean hasException(){
+        return error != Exception.NONE;
     }
 
     @Override
