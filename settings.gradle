@@ -1,0 +1,4 @@
+
+include ':com'
+
+rootProject.name = 'COM'
