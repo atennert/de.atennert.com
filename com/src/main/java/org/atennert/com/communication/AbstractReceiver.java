@@ -1,5 +1,4 @@
 /*******************************************************************************
- /*******************************************************************************
  * Copyright 2015 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,6 +18,7 @@ package org.atennert.com.communication;
 
 import org.atennert.com.interpretation.InterpreterManager;
 import org.springframework.beans.factory.annotation.Required;
+import rx.Scheduler;
 
 /**
  * This is the interface for all implemented communicators except the
@@ -26,17 +26,27 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * The run method, which is to be implemented is supposed to wait for incoming
  * requests and forward it to the interpret method of the InterpreterManager.
+ *
+ * TODO let receivers use the thread container of the communicator.
  */
 public abstract class AbstractReceiver extends Thread
 {
+    /** Interpreter manager for interpreting received data. */
     protected InterpreterManager interpreter;
+    /**
+     * Use this scheduler to handle message receiving, data interpretation and sending
+     * of responses.
+     */
+    protected Scheduler scheduler;
 
     /**
-     * Returns the address. Necessary for the ReceiverManager to get all addresses
-     * and safe them in the database.
-     * @return
+     * Set a scheduler that can be used to execute receiving and interpretation as well
+     * as sending the response.
+     * @param scheduler
      */
-    public abstract String getAddress();
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
 
     /**
      * Set the InterpreterManager.
@@ -54,6 +64,7 @@ public abstract class AbstractReceiver extends Thread
     public void dispose()
     {
         this.interrupt();
+        scheduler = null;
         interpreter = null;
     }
 }

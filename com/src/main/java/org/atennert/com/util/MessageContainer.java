@@ -22,7 +22,7 @@ public class MessageContainer
         NONE,
         UNKOWN_HOST,
         IO,
-        EMPTY;
+        EMPTY
     }
 
     public final String interpreter;

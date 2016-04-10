@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015 Andreas Tennert
+ * Copyright 2016 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -33,5 +33,5 @@ public interface ISender
      * @param message The message
      * @return The response if there is one, null otherwise.
      */
-    public MessageContainer send(String address, MessageContainer message);
+    MessageContainer send(String address, MessageContainer message);
 }

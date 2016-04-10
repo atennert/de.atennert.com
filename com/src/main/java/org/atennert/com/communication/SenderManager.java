@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright 2015 Andreas Tennert
- *
+ * Copyright 2016 Andreas Tennert
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,73 +24,20 @@ import java.util.concurrent.Future;
 
 import org.atennert.com.util.MessageContainer;
 import org.springframework.beans.factory.annotation.Required;
+import rx.functions.Func1;
 
 /**
  * This is the controller class for all implemented senders.
  */
-public class SenderManager
-{
-
-    private class Sender implements Callable<MessageContainer>
-    {
-
-        private final MessageContainer message;
-        private final String address;
-
-        private final ISender sender;
-
-        public Sender(MessageContainer message, String address, ISender sender)
-        {
-            this.message = message;
-            this.address = address;
-            this.sender = sender;
-        }
-
-        @Override
-        public MessageContainer call() throws Exception
-        {
-
-            return sender.send(address, message);
-        }
-
-    }
-
-    private ExecutorService senderPool;
-    private static final int THREAD_COUNT = 3;
+public class SenderManager {
     private Map<String, ISender> sender;
 
     @Required
-    public void setSender(Map<String, ISender> sender)
-    {
+    public void setSender(Map<String, ISender> sender) {
         this.sender = sender;
     }
 
-
-    public void init()
-    {
-        senderPool = Executors.newFixedThreadPool(THREAD_COUNT);
-    }
-
-    public void dispose()
-    {
-        senderPool.shutdown();
-    }
-
-
-    Future<MessageContainer> send(String address, MessageContainer message, String protocol) throws InstantiationException, IllegalAccessException
-    {
-        // TODO check for unknown protocol and throw exception
-
-        ISender targetSender = sender.get(protocol);
-        ISender sndr = null;
-
-        sndr = targetSender.getClass().newInstance();
-
-        if ( sndr == null )
-        {
-            return null;
-        }
-
-        return senderPool.submit(new Sender(message, address, sndr));
+    Func1<MessageContainer, MessageContainer> send(final String address, final String protocol) {
+        return message -> sender.get(protocol).send(address, message);
     }
 }

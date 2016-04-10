@@ -16,8 +16,6 @@
 
 package org.atennert.com.communication;
 
-import java.util.concurrent.Future;
-
 import org.atennert.com.util.DataContainer;
 
 /**
@@ -45,7 +43,6 @@ public interface IDataAcceptance
      *
      * @param senderAddress address from the host, that has sent the data
      * @param data the received data
-     * @return response data for the remote host, can be <code>null</code>
      */
-    Future<DataContainer> evaluateData(String senderAddress, DataContainer data);
+    void evaluateData(String senderAddress, DataContainer data);
 }

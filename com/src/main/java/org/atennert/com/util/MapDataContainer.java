@@ -16,6 +16,8 @@
 
 package org.atennert.com.util;
 
+import rx.SingleSubscriber;
+
 import java.util.Map;
 
 /**
@@ -25,9 +27,9 @@ import java.util.Map;
  */
 public class MapDataContainer extends DataContainer
 {
-    public MapDataContainer(Map<String, Object> data)
+    public MapDataContainer(Map<String, Object> data, SingleSubscriber<DataContainer> subscriber)
     {
-        super(null, data);
+        super(null, data, subscriber);
     }
 
     @SuppressWarnings("unchecked")

@@ -23,74 +23,30 @@ import java.util.Set;
  */
 public interface INodeRegistration
 {
-
-    /**
-     * Register a new node.
-     * @param name
-     * @param address
-     */
-    public void registerNode(String name);
-
-    /**
-     * Unregister a node.
-     * @param name
-     * @return
-     */
-    public void unregisterNode(String name);
-
-    /**
-     * Add a nodes address and the associated protocol.
-     * @param node
-     * @param address
-     * @param protocol
-     */
-    public void addNodeReceiveAddressProtocol(String node, String address, String protocol);
-
     /**
      * Returns a nodes addresses.
      * @param node
      * @return
      */
-    public Set<String> getNodeReceiveAddresses(String node);
+    Set<String> getNodeReceiveAddresses(String node);
 
     /**
      * Returns the protocol associated with an address.
      * @param address
      * @return
      */
-    public String getNodeReceiveProtocol(String address);
-
-    /**
-     * Deletes an entry identified by the address.
-     * @param address
-     */
-    public void deleteNodeReceiveAddressProtocol(String address);
-
-    /**
-     * Adds a node interpreter combination.
-     * @param node
-     * @param interpreter
-     * @param protocols the protocols, for which the interpreter can be used
-     */
-    public void addNodeInterpreter(String node, String interpreter);
+    String getNodeReceiveProtocol(String address);
 
     /**
      * Returns the interpreters from a node.
      * @param node
      * @return
      */
-    public Set<String> getNodeInterpreters(String node);
+    Set<String> getNodeInterpreters(String node);
 
     /**
      * @param protocol
      * @return the interpreters that can be used with the given protocol
      */
-    public Set<String> getInterpretersForProtocol(String protocol);
-
-    /**
-     * Deletes a node interpreter combination.
-     * @param node
-     * @param interpreter
-     */
-    public void deleteNodeInterpreter(String node, String interpreter);
+    Set<String> getInterpretersForProtocol(String protocol);
 }

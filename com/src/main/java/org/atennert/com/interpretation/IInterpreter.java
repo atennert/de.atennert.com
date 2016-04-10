@@ -34,7 +34,7 @@ public interface IInterpreter
      * @param message
      * @return
      */
-    public DataContainer decode(MessageContainer message);
+    DataContainer decode(MessageContainer message);
 
     /**
      * Encode data to a message that is to be send.
@@ -42,16 +42,15 @@ public interface IInterpreter
      * @param data
      * @return
      */
-    public String encode(DataContainer data);
+    String encode(DataContainer data);
 
     /**
      * Interpret a received request from another node.
      *
      * @param message
-     * @param sender
+     * @param senderAddress
      * @param acceptance
-     * @param nr
      * @return
      */
-    public String interpret(MessageContainer message, String sender, IDataAcceptance acceptance, INodeRegistration nr);
+    String interpret(MessageContainer message, String senderAddress, IDataAcceptance acceptance);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014 Andreas Tennert
+ * Copyright 2016 Andreas Tennert
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,14 +16,10 @@
 
 package org.atennert.com.communication;
 
-import java.util.concurrent.Future;
-
 import org.atennert.com.util.DataContainer;
 
 /**
  * Interface for accessing communicator functionality.
- *
- * @author Andreas Tennert
  */
 public interface ICommunicatorAccess
 {
@@ -34,17 +30,5 @@ public interface ICommunicatorAccess
      * @param hostname Target, the data has to be send to
      * @param data The data to send
      */
-    Future<DataContainer> send(String hostname, DataContainer data);
-
-    /**
-     * This method forwards a message of a specified interpreter type to another
-     * node. <br>
-     * <br>
-     * <i>Only Interpreters should use this method.</i>
-     *
-     * @param hostname
-     * @param message
-     * @return
-     */
-    String forward(String hostname, String message);
+    void send(String hostname, DataContainer data);
 }
