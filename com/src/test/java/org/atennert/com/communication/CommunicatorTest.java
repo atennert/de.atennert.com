@@ -20,6 +20,7 @@ import org.atennert.com.interpretation.InterpreterManager;
 import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -86,6 +87,11 @@ public class CommunicatorTest {
         }).when(executor).execute(any(Runnable.class));
     }
 
+    @After
+    public void tearDown(){
+        communicator.dispose();
+    }
+
     @Test
     public void init(){
         AbstractReceiver receiver = mock(AbstractReceiver.class);
@@ -95,6 +101,7 @@ public class CommunicatorTest {
 
         communicator.init();
         verify(receiver).setScheduler(any(Scheduler.class));
+        verify(interpreter).setScheduler(any(Scheduler.class));
         verify(receiver).start();
     }
 

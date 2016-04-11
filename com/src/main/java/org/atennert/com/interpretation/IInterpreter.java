@@ -20,6 +20,7 @@ import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import rx.Scheduler;
 
 /**
  * This class serves as Interface for all implemented Interpreters. The type
@@ -50,7 +51,8 @@ public interface IInterpreter
      * @param message
      * @param senderAddress
      * @param acceptance
+     * @param scheduler
      * @return
      */
-    String interpret(MessageContainer message, String senderAddress, IDataAcceptance acceptance);
+    String interpret(MessageContainer message, String senderAddress, IDataAcceptance acceptance, Scheduler scheduler);
 }

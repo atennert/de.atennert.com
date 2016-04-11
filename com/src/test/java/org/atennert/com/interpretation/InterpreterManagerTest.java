@@ -17,11 +17,13 @@
 package org.atennert.com.interpretation;
 
 import org.atennert.com.communication.IDataAcceptance;
-import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import rx.Scheduler;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
 
@@ -31,7 +33,10 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
  * Test cases for the {@link InterpreterManager} class.
@@ -41,30 +46,44 @@ public class InterpreterManagerTest {
     private InterpreterManager manager;
     private Map<String, IInterpreter> map;
     private DataContainer data;
+    @Mock
+    private IDataAcceptance dataAcceptance;
+    @Mock
+    private IInterpreter interpreter;
+    @Mock
+    private Scheduler scheduler;
 
     @Before
     public void setUp() {
+        initMocks(this);
+
         manager = new InterpreterManager();
 
         data = new DataContainer("id", "data", mock(SingleSubscriber.class));
 
         map = new HashMap<>();
-        manager.setInterpreters(map);
 
-        IInterpreter interpreter = mock(IInterpreter.class);
         doAnswer(inv -> ((DataContainer) inv.getArguments()[0]).data).when(interpreter).encode(any(DataContainer.class));
         doAnswer(inv -> data).when(interpreter).decode(any(MessageContainer.class));
         doAnswer(inv -> ((MessageContainer) inv.getArguments()[0]).message).when(interpreter).interpret(
-                any(MessageContainer.class), eq("sender"), any(IDataAcceptance.class));
+                any(MessageContainer.class), eq("sender"), eq(dataAcceptance), eq(scheduler));
         map.put("interpreter", interpreter);
+
+        manager.setInterpreters(map);
+        manager.setDataAcceptance(dataAcceptance);
+        manager.setScheduler(scheduler);
+    }
+
+    @After
+    public void tearDown(){
+        manager.dispose();
     }
 
     @Test(expected = NullPointerException.class)
     public void encodeNoInterpreter() {
         manager.setInterpreters(null);
-        DataContainer container = new DataContainer(null, null, null);
         Func1<DataContainer, MessageContainer> func = manager.encode("interpreter");
-        func.call(container);
+        func.call(data);
     }
 
     @Test(expected = NullPointerException.class)
@@ -81,6 +100,7 @@ public class InterpreterManagerTest {
         MessageContainer mc = func.call(data);
         assertEquals(data.data, mc.message);
         assertEquals("interpreter", mc.interpreter);
+        verify(interpreter).encode(data);
     }
 
     @Test
@@ -90,6 +110,7 @@ public class InterpreterManagerTest {
         Func1<MessageContainer, DataContainer> func = manager.decode();
         DataContainer s = func.call(container);
         assertEquals(data, s);
+        verify(interpreter).decode(eq(container));
     }
 
     @Test
@@ -99,5 +120,6 @@ public class InterpreterManagerTest {
         Func1<MessageContainer, String> func = manager.interpret("sender");
         String s = func.call(container);
         assertEquals(container.message, s);
+        verify(interpreter).interpret(eq(container), eq("sender"), eq(dataAcceptance), eq(scheduler));
     }
 }

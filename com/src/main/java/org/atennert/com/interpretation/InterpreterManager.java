@@ -17,10 +17,10 @@
 package org.atennert.com.interpretation;
 
 import org.atennert.com.communication.IDataAcceptance;
-import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
 import org.springframework.beans.factory.annotation.Required;
+import rx.Scheduler;
 import rx.functions.Func1;
 
 import java.util.Map;
@@ -37,6 +37,7 @@ public class InterpreterManager {
      * Objects accessible for interpretation process
      */
     private IDataAcceptance acceptance;
+    private Scheduler scheduler;
 
 
     @Required
@@ -49,21 +50,21 @@ public class InterpreterManager {
         this.acceptance = acceptance;
     }
 
-    public void init() {
-        /*
-         * TODO use the following
-         * <bean id="executor" class="java.util.concurrent.Executors" method="newFixedThreadPool"
-         *      destroy-method="shutdown"> 
-         *   <constructor-arg index="0" value="4" /> 
-         * </bean> 
-         */
+    /**
+     * Sets the scheduler, that is forwarded to interpreters as parameter of the interpret method.
+     * <em>This is supposed to be used by the Communicator instance only!!!</em>
+     * @param scheduler The scheduler that will be forwarded to the interpreter
+     */
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
+
     public void dispose() {
+        this.scheduler = null;
         this.interpreters = null;
         this.acceptance = null;
     }
-
 
     /**
      * Encodes a specific data type to a String for transmission purposes. Used
@@ -92,6 +93,6 @@ public class InterpreterManager {
      * @return A RxJava function that interprets a message
      */
     public Func1<MessageContainer, String> interpret(final String senderAddress) {
-        return message -> interpreters.get(message.interpreter).interpret(message, senderAddress, acceptance);
+        return message -> interpreters.get(message.interpreter).interpret(message, senderAddress, acceptance, scheduler);
     }
 }
