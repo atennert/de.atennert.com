@@ -1,0 +1,34 @@
+@startuml
+
+title Request from application
+
+participant App
+participant Consumer
+participant Com
+
+activate App
+App -> Consumer* : create()
+note over Consumer #6CC
+    The Consumer is actually
+    part of the data container
+end note
+
+App -> Com : send(data, consumer)
+activate Com
+note over Com #3C3
+    Running in own thread
+end note
+Com -> Com : send(data)
+...
+Com --> Consumer : call(response)
+deactivate Com
+activate Consumer
+note over Consumer
+   Response data should be evaluated
+   in thread of application.
+end note
+Consumer -> App : evaluate(response)
+deactivate Consumer
+destroy Consumer
+
+@enduml

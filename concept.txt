@@ -1,0 +1,35 @@
+
+Receiving concept
+=================
+
+Session extends Action {
+    public String senderAddress;
+}
+
+Receiver {
+    public void receive(){
+        Session session = createSession(); // session contains or is or implements an action
+        Single.just(session)
+                .subscribeOn(scheduler)
+                .map(ReceiverFunction(session))
+                .interpret(session);
+    }
+}
+
+Interpreter {
+    public void interpret(MessageContainer, Session, DataAcceptance, Scheduler) {
+        ...
+
+        dataAcceptance.accept(sender, new DataContainer(session.sender, data, new Subscriber(session)));
+    }
+
+    Subscriber {
+        Session session;
+        public void call(data){
+            Single.just(data)
+                    .subscribeOn(scheduler)
+                    .encode()
+                    .subscribe(session);
+        }
+    }
+}

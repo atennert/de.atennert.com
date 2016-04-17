@@ -44,5 +44,5 @@ public interface IDataAcceptance
      * @param senderAddress address from the host, that has sent the data
      * @param data the received data
      */
-    void evaluateData(String senderAddress, DataContainer data);
+    void accept(String senderAddress, DataContainer data);
 }

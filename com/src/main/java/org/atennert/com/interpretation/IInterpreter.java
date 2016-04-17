@@ -20,6 +20,7 @@ import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.registration.INodeRegistration;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import org.atennert.com.util.Session;
 import rx.Scheduler;
 
 /**
@@ -49,10 +50,10 @@ public interface IInterpreter
      * Interpret a received request from another node.
      *
      * @param message
-     * @param senderAddress
+     * @param session
      * @param acceptance
      * @param scheduler
      * @return
      */
-    String interpret(MessageContainer message, String senderAddress, IDataAcceptance acceptance, Scheduler scheduler);
+    String interpret(MessageContainer message, Session session, IDataAcceptance acceptance, Scheduler scheduler);
 }

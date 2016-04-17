@@ -1,0 +1,56 @@
+@startuml
+
+title Reciving of messages
+
+participant Receiver
+participant Session
+participant Interpreter
+participant Consumer
+participant App
+
+activate Receiver
+activate App
+[-> Receiver : receive(message)
+Receiver -> Session* : create()
+activate Session
+note over Receiver
+    Use given scheduler to run message
+    decoding and interpreting in thread pool.
+end note
+
+Receiver -> Receiver : startThread()
+activate Receiver
+Receiver -> Receiver : decode(message)
+Receiver -> Interpreter : interpret(messageData)
+deactivate Receiver
+
+activate Interpreter
+Interpreter -> Interpreter : decode(messageData)
+Interpreter -> Consumer* : create()
+note over Consumer #6CC
+    The Consumer is actually
+    part of the data container
+end note
+Interpreter -> App : evaluate(data, consumer)
+deactivate Interpreter
+
+activate App
+note over App
+    Let evaluation run in app thread
+end note
+...
+App -> Consumer : call(responseData)
+deactivate App
+
+activate Consumer
+note over Consumer, Session
+    Let encoding and sending run in Com scheduler
+end note
+Consumer -> Interpreter : encode(responseData)
+Consumer -> Session : send(responseMessageData)
+
+[<- Session : send(responseMessage)
+destroy Consumer
+deactivate Session
+
+@enduml

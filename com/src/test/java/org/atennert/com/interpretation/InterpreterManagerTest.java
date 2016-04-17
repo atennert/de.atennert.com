@@ -19,12 +19,15 @@ package org.atennert.com.interpretation;
 import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import org.atennert.com.util.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import rx.Scheduler;
+import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.HashMap;
@@ -47,6 +50,8 @@ public class InterpreterManagerTest {
     private Map<String, IInterpreter> map;
     private DataContainer data;
     @Mock
+    private Session session;
+    @Mock
     private IDataAcceptance dataAcceptance;
     @Mock
     private IInterpreter interpreter;
@@ -66,7 +71,7 @@ public class InterpreterManagerTest {
         doAnswer(inv -> ((DataContainer) inv.getArguments()[0]).data).when(interpreter).encode(any(DataContainer.class));
         doAnswer(inv -> data).when(interpreter).decode(any(MessageContainer.class));
         doAnswer(inv -> ((MessageContainer) inv.getArguments()[0]).message).when(interpreter).interpret(
-                any(MessageContainer.class), eq("sender"), eq(dataAcceptance), eq(scheduler));
+                any(MessageContainer.class), eq(session), eq(dataAcceptance), eq(scheduler));
         map.put("interpreter", interpreter);
 
         manager.setInterpreters(map);
@@ -117,9 +122,9 @@ public class InterpreterManagerTest {
     public void interpret() {
         MessageContainer container = new MessageContainer("interpreter", "message");
 
-        Func1<MessageContainer, String> func = manager.interpret("sender");
+        Func1<MessageContainer, String> func = manager.interpret(session);
         String s = func.call(container);
         assertEquals(container.message, s);
-        verify(interpreter).interpret(eq(container), eq("sender"), eq(dataAcceptance), eq(scheduler));
+        verify(interpreter).interpret(eq(container), eq(session), eq(dataAcceptance), eq(scheduler));
     }
 }

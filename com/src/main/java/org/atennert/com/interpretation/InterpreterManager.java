@@ -19,6 +19,7 @@ package org.atennert.com.interpretation;
 import org.atennert.com.communication.IDataAcceptance;
 import org.atennert.com.util.DataContainer;
 import org.atennert.com.util.MessageContainer;
+import org.atennert.com.util.Session;
 import org.springframework.beans.factory.annotation.Required;
 import rx.Scheduler;
 import rx.functions.Func1;
@@ -89,10 +90,10 @@ public class InterpreterManager {
     /**
      * Interprets a message. Used by specific receivers.
      *
-     * @param senderAddress The address of the sender of the received message
+     * @param session The session for receiving the message and sending the response
      * @return A RxJava function that interprets a message
      */
-    public Func1<MessageContainer, String> interpret(final String senderAddress) {
-        return message -> interpreters.get(message.interpreter).interpret(message, senderAddress, acceptance, scheduler);
+    public Func1<MessageContainer, String> interpret(final Session session) {
+        return message -> interpreters.get(message.interpreter).interpret(message, session, acceptance, scheduler);
     }
 }
