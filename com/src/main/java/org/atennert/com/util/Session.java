@@ -21,7 +21,7 @@ import rx.functions.Action1;
 /**
  * Base implementation for a session object.
  */
-public abstract class Session implements Action1<DataContainer> {
+public abstract class Session implements Action1<String> {
 
     /**
      * Use this scheduler to decouple the sending of the response from the application thread.
