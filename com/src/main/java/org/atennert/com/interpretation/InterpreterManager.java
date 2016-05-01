@@ -22,6 +22,7 @@ import org.atennert.com.util.MessageContainer;
 import org.atennert.com.util.Session;
 import org.springframework.beans.factory.annotation.Required;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.Map;
@@ -93,7 +94,7 @@ public class InterpreterManager {
      * @param session The session for receiving the message and sending the response
      * @return A RxJava function that interprets a message
      */
-    public Func1<MessageContainer, String> interpret(final Session session) {
+    public Action1<MessageContainer> interpret(final Session session) {
         return message -> interpreters.get(message.interpreter).interpret(message, session, acceptance, scheduler);
     }
 }

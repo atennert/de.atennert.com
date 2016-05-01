@@ -53,7 +53,6 @@ public interface IInterpreter
      * @param session
      * @param acceptance
      * @param scheduler
-     * @return
      */
-    String interpret(MessageContainer message, Session session, IDataAcceptance acceptance, Scheduler scheduler);
+    void interpret(MessageContainer message, Session session, IDataAcceptance acceptance, Scheduler scheduler);
 }

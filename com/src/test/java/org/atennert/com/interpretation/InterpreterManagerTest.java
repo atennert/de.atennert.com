@@ -122,9 +122,8 @@ public class InterpreterManagerTest {
     public void interpret() {
         MessageContainer container = new MessageContainer("interpreter", "message");
 
-        Func1<MessageContainer, String> func = manager.interpret(session);
-        String s = func.call(container);
-        assertEquals(container.message, s);
+        Action1<MessageContainer> func = manager.interpret(session);
+        func.call(container);
         verify(interpreter).interpret(eq(container), eq(session), eq(dataAcceptance), eq(scheduler));
     }
 }
