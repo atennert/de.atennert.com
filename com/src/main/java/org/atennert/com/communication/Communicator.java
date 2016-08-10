@@ -66,16 +66,20 @@ public class Communicator implements ICommunicatorAccess {
     /**
      * Set an executor. This is needed for an internal scheduler.
      *
-     * @param executor The thread executor<br>
+     * @param scheduler The thread scheduler<br>
      *                 Instantiate in Spring for example with:<br>
-     *                 &lt;bean id="executor" class="java.util.concurrent.Executors" method="newFixedThreadPool"
+     *                 &lt;bean id="scheduler" class="rx.schedulers.Schedulers" factory-method="from"&gt;<br>
+     *                 &lt;constructor-arg index="0"&gt;<br>
+     *                 &lt;bean id="executor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool"
      *                 destroy-method="shutdown"&gt;<br>
      *                 &lt;constructor-arg index="0" value="4" /&gt;&lt;!-- Thread count --&gt;<br>
-     *                 &lt;/bean&gt; 
+     *                 &lt;/bean&gt;<br>
+     *                 &lt;/constructor-arg&gt;<br>
+     *                 &lt;/bean&gt;
      */
     @Required
-    public void setExecutor(final ExecutorService executor) {
-        this.scheduler = Schedulers.from(executor);
+    public void setScheduler(final Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
 

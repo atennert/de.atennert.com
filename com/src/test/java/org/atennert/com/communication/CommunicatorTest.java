@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import rx.Scheduler;
 import rx.SingleSubscriber;
+import rx.functions.Action0;
 import rx.functions.Func1;
 
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class CommunicatorTest {
     private InterpreterManager interpreter;
 
     @Mock
-    private ExecutorService executor;
+    private Scheduler executor;
 
     @Before
     public void setUp() {
@@ -70,7 +71,7 @@ public class CommunicatorTest {
         communicator.setNodeRegistration(registration);
         communicator.setSenderManager(sender);
         communicator.setInterpreterManager(interpreter);
-        communicator.setExecutor(executor);
+        communicator.setScheduler(executor);
 
         Set<String> addresses = new HashSet<>();
         addresses.add(HOST_ADDRESS);
@@ -81,10 +82,12 @@ public class CommunicatorTest {
         doReturn(interpreters).when(registration).getNodeInterpreters(HOST_NAME);
         doReturn(interpreters).when(registration).getInterpretersForProtocol(HOST_PROTOCOL);
 
+        Scheduler.Worker worker = mock(Scheduler.Worker.class);
         doAnswer(invocation -> {
-            ((Runnable)invocation.getArguments()[0]).run();
+            ((Action0)invocation.getArguments()[0]).call();
             return null;
-        }).when(executor).execute(any(Runnable.class));
+        }).when(worker).schedule(any());
+        doReturn(worker).when(executor).createWorker();
     }
 
     @After
