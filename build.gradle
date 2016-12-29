@@ -1,22 +1,69 @@
 
-group = "org.atennert.com"
-
-allprojects {
+buildscript {
+    repositories {
+        jcenter()
+    }
 }
 
-subprojects {
-    apply plugin : 'java'
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+apply plugin : 'java'
+apply plugin : 'maven'
+apply plugin : 'maven-publish'
 
-    repositories {
-        mavenCentral()
+archivesBaseName = "com"
+version = "2.1.0"
+group = "de.atennert"
+description = "Communication framework for two stage communication handling (data de-/encoding and sending/receiving)"
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = project.archivesBaseName
+            version = project.version
+        }
     }
+}
 
-    dependencies {
-        testCompile "junit:junit:4+"
-        testCompile "org.mockito:mockito-all:1.9.5"
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTREY_KEY')
+    publications = ['MyPublication']
+    publish = true
+    pkg {
+        repo = 'com'
+        name = 'com'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/atennert/de.atennert.com.git'
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+        }
     }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "org.springframework:spring-core:4.3.3.RELEASE"
+    compile "org.springframework:spring-expression:4.3.3.RELEASE"
+    compile "org.springframework:spring-beans:4.3.3.RELEASE"
+    compile "io.reactivex:rxjava:1+"
+    compile "org.slf4j:slf4j-api:1.6.4"
+    compile "org.slf4j:jcl-over-slf4j:1.6.4"
+    compile "org.slf4j:slf4j-log4j12:1.6.4"
+
+    testCompile "junit:junit:4+"
+    testCompile "org.mockito:mockito-all:1.9.5"
 }
 
