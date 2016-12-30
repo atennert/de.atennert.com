@@ -1,4 +1,2 @@
 
-include ':com'
-
-rootProject.name = 'COM'
+rootProject.name = 'com'
