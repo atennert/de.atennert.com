@@ -2,12 +2,12 @@
 
 ## Status
 __master__:<br>
-[![Build Status](https://travis-ci.org/atennert/de.atennert.eoconnector.svg?branch=master)](https://travis-ci.org/atennert/de.atennert.com)
-[![Release](https://img.shields.io/github/release/atennert/de.atennert.eoconnector.svg)](https://github.com/atennert/de.atennert.com/releases)
+[![Build Status](https://travis-ci.org/atennert/de.atennert.com.svg?branch=master)](https://travis-ci.org/atennert/de.atennert.com)
+[![Release](https://img.shields.io/github/release/atennert/de.atennert.com.svg)](https://github.com/atennert/de.atennert.com/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 __devel__:<br>
-[![Build Status](https://travis-ci.org/atennert/de.atennert.eoconnector.svg?branch=devel)](https://travis-ci.org/atennert/de.atennert.com)
+[![Build Status](https://travis-ci.org/atennert/de.atennert.com.svg?branch=devel)](https://travis-ci.org/atennert/de.atennert.com)
 
 ## Overview
 
