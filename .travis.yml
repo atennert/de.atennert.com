@@ -1,0 +1,10 @@
+language: java
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+deploy:
+  provider: script
+  script: deploy.sh
+  on:
+    tags: true
